@@ -20,4 +20,7 @@
     <string name="system_volume_title">System</string>
     <!-- Sound settings screen, mute checkbox title -->
     <string name="mute_volume_tilte">Mute</string>
+
+    <string name="keep_volume_tilte">Keep</string>
+
 </resources>

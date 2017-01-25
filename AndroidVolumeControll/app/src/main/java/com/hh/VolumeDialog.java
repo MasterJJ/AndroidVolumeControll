@@ -23,9 +23,23 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import com.hh.SimpleSharedPresetVal;
 
 public class VolumeDialog extends Dialog implements OnClickListener, DialogInterface.OnDismissListener {
 	private static String TAG = VolumeDialog.class.getSimpleName();
+
+    // define api16 version
+    public static final String VOLUME_RING = "volume_ring";
+    public static final String VOLUME_SYSTEM = "volume_system";
+    public static final String VOLUME_VOICE = "volume_voice";
+    public static final String VOLUME_MUSIC = "volume_music";
+    public static final String VOLUME_ALARM = "volume_alarm";
+    public static final String VOLUME_BLUETOOTH_SCO = "volume_bluetooth_sco";
+    public static final String VOLUME_NOTIFICATION = "volume_notification";
+    private  static final String[] DEF_VOLUME_SETTINGS = {
+            VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING, VOLUME_MUSIC,
+            VOLUME_ALARM, VOLUME_NOTIFICATION, VOLUME_BLUETOOTH_SCO
+    };
 
     private SeekBarVolumizer[] mSeekBarVolumizer;
     private static final int[] SEEKBAR_ID = new int[] {
@@ -50,21 +64,26 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     };
     
     private Context mCtx = null;
-    
+    private SimpleSharedPresetVal settingData = null;
     private Context mContext;
     private Button mButtonOK;
     private Button mButtonCancel;
     private boolean mKeepVolumeMode = true;
-    private Thread keepVolumeTrhead = null;
-        
+    private Thread  keepVolumeThread = null;
+    private static int     voiceVolumeTemp = 0;
+
     public VolumeDialog(Context context) {
         super(context,android.R.style.Theme_Dialog);
         mContext = context;
     }
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // xml ui load
     	mCtx = this.getContext();
+        settingData = new SimpleSharedPresetVal(this.getContext());
+
         requestWindowFeature(Window.ID_ANDROID_CONTENT);
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
         
@@ -90,18 +109,29 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         CheckBox checkBox = (CheckBox) findViewById(R.id.mute_volume_checkbox);
         Log.d(getClass().toString(), checkBox.toString());
         mcheckBoxMuter = new CheckBoxRinger(mContext, checkBox);
-        
-        
-        // init test_val
-        test_val = mSeekBarVolumizer[0].getVolumeVal();
-        
 
-        keepVolumeTrhead = new Thread(new Runnable() {
+
+        CheckBox checkBoxKeepVolume = (CheckBox) findViewById(R.id.keep_volum_checkbox);
+        checkBoxKeepVolume.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mKeepVolumeMode = isChecked;
+            }
+        });
+        Log.d(getClass().toString(), checkBoxKeepVolume .toString());
+
+        voiceVolumeTemp = mSeekBarVolumizer[0].getVolumeVal();
+
+        // load default value
+        settingDataControll(true);
+        // init value
+
+        //  init thread worker
+        keepVolumeThread = new Thread(new Runnable() {
         	
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				while (true) {
 					try {
 						Thread.sleep(500);
@@ -109,41 +139,65 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 						e.printStackTrace();
 					}
 					keepVolumeWorker();
-
 				}
 			}
 
 		}
 
 		);
-        keepVolumeTrhead.setDaemon(true);
-        keepVolumeTrhead.start();
-        
+        keepVolumeThread.setDaemon(true);
+        keepVolumeThread.start();
     }
-    
+
+    // load data
+    public void settingDataControll(boolean load) {
+
+        if (load) {
+            // keep mode
+            String getKeep = settingData.getPreferences("keep");
+            CheckBox check = (CheckBox) findViewById(R.id.keep_volum_checkbox);
+            if (getKeep.length() > 0)
+               check.setChecked(true);
+            else
+               check.setChecked(false);
+
+            // keep mode
+            String getVoiceVolume = settingData.getPreferences("voice_volume");
+            if (getVoiceVolume.length() > 0)
+                voiceVolumeTemp = Integer.parseInt(getVoiceVolume);
+
+        } else { // save
+            // keep mode
+            CheckBox check = (CheckBox) findViewById(R.id.keep_volum_checkbox);
+            if (check.isChecked())
+                settingData.savePreferences("keep",  "true");
+            else
+                settingData.savePreferences("keep",  "");
+
+            // keep mode
+            settingData.savePreferences("voice_volume", String.valueOf(voiceVolumeTemp));
+        }
+    }
     
     /*
      *   볼륨을 설정한 데로 제어한다.
      * 
      * */
-    public static int test_val = 0;
     public void keepVolumeWorker() {
-    	//mCtx
     	// get val
     	int current_val = mSeekBarVolumizer[0].getVolumeVal();
-    	if (test_val != current_val) {
+    	if (voiceVolumeTemp != current_val) {
     		if (mKeepVolumeMode) {
-    			mSeekBarVolumizer[0].postSetVolumeEx(test_val);
+                Log.d(TAG, "Keep Volume : " +  voiceVolumeTemp);
+    			mSeekBarVolumizer[0].postSetVolumeEx(voiceVolumeTemp);
     		} else {
-    			test_val = current_val;    			
+                voiceVolumeTemp = current_val;
+                Log.d(TAG, "Keep Volume Change: " +  voiceVolumeTemp);
     		}
     	}
     	
-    	
     	return;
     }
-    
-    
 
     @Override
     public void onClick(View arg0) {
@@ -151,6 +205,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             case R.id.buttonOK:
                 closeVolumes();
                 ((VolumeControl)mContext).close();
+                settingDataControll(false);
                 break;
             case R.id.buttonCancel:
                 revertVolume();
@@ -190,9 +245,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 
         private Context mContext;
         private Handler mHandler = new Handler();
-    
         private AudioManager mAudioManager;
-        
         private int mOriginalRingerStatus; 
     
         private boolean mLastRinger;
@@ -250,6 +303,8 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             mHandler.post(this);
         }
     }
+
+
     
     public class SeekBarVolumizer implements OnSeekBarChangeListener, Runnable {
 
@@ -270,7 +325,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
                 super.onChange(selfChange);
                 if (mSeekBar != null) {
                     int volume = Settings.System.getInt(mContext.getContentResolver(),
-                            Settings.System.VOLUME_SETTINGS[mStreamType], -1);
+                            DEF_VOLUME_SETTINGS[mStreamType], -1);
                     if (volume >= 0) {
                         mSeekBar.setProgress(volume);
                     }
@@ -287,6 +342,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             initSeekBar(seekBar);
         }
 
+
         @SuppressLint("NewApi")
 		private void initSeekBar(SeekBar seekBar) {
             seekBar.setMax(mAudioManager.getStreamMaxVolume(mStreamType));
@@ -295,7 +351,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             seekBar.setOnSeekBarChangeListener(this);
             
             mContext.getContentResolver().registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.VOLUME_SETTINGS[mStreamType]),
+                    Settings.System.getUriFor(DEF_VOLUME_SETTINGS[mStreamType]),
                     false, mVolumeObserver);
     
             Uri defaultUri = null;
@@ -362,7 +418,6 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         
         public void run() {
         	Log.d(TAG, "Set setStreamVolume");
-
             mAudioManager.setStreamVolume(mStreamType, mLastProgress, 0);
         }
         
@@ -420,6 +475,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     public void onDismiss(DialogInterface dialog) {
 
     }
+
     
     
      class KeepVolumeThread extends Thread {

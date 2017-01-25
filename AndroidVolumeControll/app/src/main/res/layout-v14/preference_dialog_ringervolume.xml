@@ -15,8 +15,7 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="fill_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal">
@@ -105,33 +104,30 @@
 				android:layout_height="match_parent"
 				android:columnCount="2"
 				android:rowCount="1"
-                android:paddingLeft="20dip"
-                android:paddingTop="2dip"
-                android:paddingRight="20dip"
-				tools:targetApi="ice_cream_sandwich">
+				android:paddingLeft="20dip"
+				android:paddingTop="2dip"
+				android:paddingRight="20dip">
 
 				<!-- Used for un/mute -->
 				<CheckBox android:id="@+id/mute_volume_checkbox"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+					android:layout_gravity="center"
 					android:paddingTop="2dip"
 					android:paddingLeft="30dip"
-					android:paddingRight="70dip"
+					android:paddingRight="30dip"
 					android:text="@string/mute_volume_tilte"/>
 
 				<!-- Used for un/mute -->
 				<CheckBox android:id="@+id/keep_volum_checkbox"
-                    android:layout_width="wrap_content"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+					android:layout_gravity="center"
 					android:paddingTop="2dip"
 					android:paddingLeft="30dip"
 					android:paddingRight="30dip"
 					android:text="@string/keep_volume_tilte"/>
-
 			</GridLayout>
-
 	        
 	        <TableRow android:id="@+id/tableRow"
 	                android:layout_height="wrap_content" 
@@ -154,7 +150,7 @@
 	                    android:layout_weight="1"/>
 	        
 	        </TableRow>
-	        
+
 	    </LinearLayout>
 	</ScrollView>
 </LinearLayout>
