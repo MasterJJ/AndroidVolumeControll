@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "E:\\android_work\\AndroidVolumeControll\\app\\build\\intermediates\\res\\merged\\debug\\layout\\main.xml",
+        "source": "E:\\android_work\\AndroidVolumeControll\\app\\src\\main\\res\\layout\\main.xml"
+    },
+    {
+        "merged": "E:\\android_work\\AndroidVolumeControll\\app\\build\\intermediates\\res\\merged\\debug\\layout\\preference_dialog_ringervolume.xml",
+        "source": "E:\\android_work\\AndroidVolumeControll\\app\\src\\main\\res\\layout\\preference_dialog_ringervolume.xml"
+    }
+]
