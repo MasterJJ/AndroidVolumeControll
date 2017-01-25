@@ -134,7 +134,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(500);
+						Thread.sleep(300);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -476,15 +476,4 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 
     }
 
-    
-    
-     class KeepVolumeThread extends Thread {
-    	 public void run() {
-    		 // get mode 
-    		 // get value
-    		 // set volume
-    		 
-    		 
-    	 }
-    };
 }
