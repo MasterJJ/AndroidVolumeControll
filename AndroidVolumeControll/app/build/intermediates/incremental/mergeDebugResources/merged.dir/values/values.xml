@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Volume Control</string>
+    <string name="incoming_call_volume_title">Incoming Call</string>
+    <string name="media_volume_title">Media</string>
+    <string name="mute_volume_tilte">Mute</string>
+    <string name="notification_volume_title">Notification</string>
+    <string name="silent_mode_incl_alarm_summary">All sounds except media are silenced</string>
+    <string name="silent_mode_summary">Silence all sounds except media &amp; alarms</string>
+    <string name="silent_mode_title">Silent mode</string>
+    <string name="sound_settings">Sound settings</string>
+    <string name="system_volume_title">System</string>
+</resources>
