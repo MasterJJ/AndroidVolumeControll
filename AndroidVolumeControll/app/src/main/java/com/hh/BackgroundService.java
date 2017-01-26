@@ -158,7 +158,7 @@ public class BackgroundService extends Service {
 
             System.out.println("onStart Backgroundservice");
             Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
-            startKeepVolumeWorker(true);
+            //startKeepVolumeWorker(true);
         } else {
             stopForeground(true);
         }
@@ -169,9 +169,21 @@ public class BackgroundService extends Service {
 
     @Override
     public void onStart(Intent intent, int startid) {
-        Intent newIntent = new Intent(this, VolumeDialog.class);
-        startActivity(newIntent);
-
+        //Intent newIntent = new Intent(this, VolumeDialog.class);
+        //startActivity(newIntent);
+        startKeepVolumeWorker(true);
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+        System.out.println("onStart Backgroundservice");
+        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
     }
 
     @Override
