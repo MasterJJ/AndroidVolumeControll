@@ -1,6 +1,5 @@
 package com.hh;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Service;
@@ -17,7 +16,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class BackgroundService extends Service {
@@ -40,6 +38,10 @@ public class BackgroundService extends Service {
             VOLUME_ALARM, VOLUME_NOTIFICATION, VOLUME_BLUETOOTH_SCO
     };
 
+    AudioManager audioManager = null;
+    //(AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+
     private final IBinder localBinder  = new BackgounrdServiceBinder();
 
     public class BackgounrdServiceBinder extends Binder {
@@ -48,7 +50,6 @@ public class BackgroundService extends Service {
         }
     }
 
-
     // dowork
     // member valuse
     private static Context mCtx = null;
@@ -56,6 +57,7 @@ public class BackgroundService extends Service {
     private static boolean keepVolumeMode = false;
     private Thread  keepVolumeThread = null;
     private static boolean foregroundServiceMode = false;
+    private static int voiceVolumeTemp = 0;
 
     // load setting
     private SimpleSharedPresetVal settingData = null;
@@ -91,6 +93,7 @@ public class BackgroundService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, " Run Background keepVolumeThread");
+                System.out.println("Run Background keepVolumeThread");
                 while (keepVolumeMode) {
                     try {
                         Thread.sleep(300);
@@ -99,8 +102,10 @@ public class BackgroundService extends Service {
                     }
                     keepVolumeWorker();
                     Log.e(TAG, " Run keepVolumeThread Background service");
+                    System.out.println("Run keepVolumeThread Background service");
 
                 }
+                System.out.println("Exit keepVolumeThread");
                 Log.e(TAG, " Exit keepVolumeThread");
             }
 
@@ -117,7 +122,7 @@ public class BackgroundService extends Service {
                 foregroundServiceMode = foreGround;
 
 
-                startForeground(DEF_FOREGROUND_ID, new Notification());
+                startForeground(Constants.NOTIFICATION_ID.FORGROUND_SERVICE, new Notification());
             }
         }
 
@@ -132,34 +137,49 @@ public class BackgroundService extends Service {
     * */
     public void keepVolumeWorker() {
         // get val
-        /*
-        int current_val = mSeekBarVolumizer[0].getVolumeVal();
+        int current_val = audioManager.getStreamVolume(0);
         if (voiceVolumeTemp != current_val) {
-            if (mKeepVolumeMode) {
+            if (keepVolumeMode) {
                 Log.d(TAG, "Keep Volume : " +  voiceVolumeTemp);
-                mSeekBarVolumizer[0].postSetVolumeEx(voiceVolumeTemp);
+                System.out.println("Keep Volume : ");
+                audioManager.setStreamVolume(0, voiceVolumeTemp, 0);
             } else {
                 voiceVolumeTemp = current_val;
                 Log.d(TAG, "Keep Volume Change: " +  voiceVolumeTemp);
+                System.out.println("Keep Volume Change: ");
             }
         }
-        */
-
         return;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent.getAction().equals(Constants.ACTION.STARTFORGROUND_ACTION)) {
 
-        startKeepVolumeWorker(true);
+            System.out.println("onStart Backgroundservice");
+            Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+            startKeepVolumeWorker(true);
+        } else {
+            stopForeground(true);
+        }
+
 
        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onStart(Intent intent, int startid) {
+        Intent newIntent = new Intent(this, VolumeDialog.class);
+        startActivity(newIntent);
+
     }
 
     @Override
     public void onCreate() {
         mCtx = this;
         settingData = new SimpleSharedPresetVal(mCtx);
+        audioManager = (AudioManager) mCtx.getSystemService(Context.AUDIO_SERVICE);
+
     }
 
     @Override
@@ -181,7 +201,7 @@ public class BackgroundService extends Service {
             // keep mode
             String getVoiceVolume = settingData.getPreferences("voice_volume");
             if (getVoiceVolume.length() > 0)
-                voiceVolume = Integer.parseInt(getVoiceVolume);
+                voiceVolumeTemp =  voiceVolume = Integer.parseInt(getVoiceVolume);
 
         }
     }

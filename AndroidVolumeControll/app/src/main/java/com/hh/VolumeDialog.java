@@ -77,6 +77,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     private static int     voiceVolumeTemp = 0;
 
 
+    /*
     private BackgroundService backgroundService = null;
     private ServiceConnection serviceConnect = new ServiceConnection() {
         @Override
@@ -90,6 +91,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             backgroundService = null;
         }
     };
+    */
 
 
 
@@ -107,8 +109,10 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         settingData = new SimpleSharedPresetVal(this.getContext());
 
         // bind service
-        Intent intent = new Intent(mCtx, BackgroundService.class);
-        mCtx.bindService(intent, serviceConnect, Context.BIND_AUTO_CREATE);
+        /*
+            Intent intent = new Intent(mCtx, BackgroundService.class);
+            mCtx.bindService(intent, serviceConnect, Context.BIND_AUTO_CREATE);
+        */
 
         requestWindowFeature(Window.ID_ANDROID_CONTENT);
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
@@ -144,11 +148,15 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
                 mKeepVolumeMode = isChecked;
                 if (isChecked) {
                     settingDataControll(false);
+                    /*
                     if (backgroundService != null)
                         backgroundService.startKeepVolumeWorker(true);
+                        */
                 } else {
+                    /*
                     if (backgroundService != null)
                         backgroundService.stopKeepVolumeWorker();
+                        */
                 }
 
             }
@@ -241,12 +249,21 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     public void onClick(View arg0) {
         switch (arg0.getId()) {
             case R.id.buttonOK:
-                mCtx.unbindService(serviceConnect);
+                //mCtx.unbindService(serviceConnect);
                 settingDataControll(false);
                 closeVolumes();
 
                 if (mKeepVolumeMode) {
-                    //start forground service
+                    //start forground
+                    Intent startIntent;
+                    startIntent = new Intent(mCtx, BackgroundService.class);
+                    startIntent.setAction(Constants.ACTION.STARTFORGROUND_ACTION);
+                    mCtx.startService(startIntent);
+                } else {
+                    Intent startIntent;
+                    startIntent = new Intent(mCtx, BackgroundService.class);
+                    startIntent.setAction(Constants.ACTION.STOPFORGROUND_ACTION);
+                    mCtx.startService(startIntent);
 
                 }
 
@@ -254,10 +271,12 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 
                 break;
             case R.id.buttonCancel:
-                mCtx.unbindService(serviceConnect);
+                //mCtx.unbindService(serviceConnect);
                 revertVolume();
                 closeVolumes();
                 ((VolumeControl)mContext).close();
+
+
                 break;
         }
     }

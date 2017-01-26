@@ -17,6 +17,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:icon="@drawable/ic_settings_sound"
@@ -35,8 +36,7 @@
 
         <service
             android:name=".BackgroundService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:enabled="true"></service>
 
     </application>
 
