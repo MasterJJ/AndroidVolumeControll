@@ -2,8 +2,11 @@ package com.hh;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.media.Ringtone;
@@ -11,6 +14,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -72,10 +76,28 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     private Thread  keepVolumeThread = null;
     private static int     voiceVolumeTemp = 0;
 
+
+    private BackgroundService backgroundService = null;
+    private ServiceConnection serviceConnect = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        BackgroundService.BackgounrdServiceBinder binder = (BackgroundService.BackgounrdServiceBinder)service;
+            backgroundService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            backgroundService = null;
+        }
+    };
+
+
+
     public VolumeDialog(Context context) {
         super(context,android.R.style.Theme_Dialog);
         mContext = context;
     }
+
 
 
     @Override
@@ -83,6 +105,10 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         // xml ui load
     	mCtx = this.getContext();
         settingData = new SimpleSharedPresetVal(this.getContext());
+
+        // bind service
+        Intent intent = new Intent(mCtx, BackgroundService.class);
+        mCtx.bindService(intent, serviceConnect, Context.BIND_AUTO_CREATE);
 
         requestWindowFeature(Window.ID_ANDROID_CONTENT);
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
@@ -116,6 +142,15 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mKeepVolumeMode = isChecked;
+                if (isChecked) {
+                    settingDataControll(false);
+                    if (backgroundService != null)
+                        backgroundService.startKeepVolumeWorker(true);
+                } else {
+                    if (backgroundService != null)
+                        backgroundService.stopKeepVolumeWorker();
+                }
+
             }
         });
         Log.d(getClass().toString(), checkBoxKeepVolume .toString());
@@ -147,6 +182,9 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
 		);
         keepVolumeThread.setDaemon(true);
         keepVolumeThread.start();
+
+
+
     }
 
     // load data
@@ -203,11 +241,20 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     public void onClick(View arg0) {
         switch (arg0.getId()) {
             case R.id.buttonOK:
-                closeVolumes();
-                ((VolumeControl)mContext).close();
+                mCtx.unbindService(serviceConnect);
                 settingDataControll(false);
+                closeVolumes();
+
+                if (mKeepVolumeMode) {
+                    //start forground service
+
+                }
+
+                ((VolumeControl)mContext).close();
+
                 break;
             case R.id.buttonCancel:
+                mCtx.unbindService(serviceConnect);
                 revertVolume();
                 closeVolumes();
                 ((VolumeControl)mContext).close();
