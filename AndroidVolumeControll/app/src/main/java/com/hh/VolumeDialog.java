@@ -77,21 +77,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     private static int     voiceVolumeTemp = 0;
 
 
-    /*
-    private BackgroundService backgroundService = null;
-    private ServiceConnection serviceConnect = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        BackgroundService.BackgounrdServiceBinder binder = (BackgroundService.BackgounrdServiceBinder)service;
-            backgroundService = binder.getService();
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            backgroundService = null;
-        }
-    };
-    */
 
 
 
@@ -108,11 +94,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     	mCtx = this.getContext();
         settingData = new SimpleSharedPresetVal(this.getContext());
 
-        // bind service
-        /*
-            Intent intent = new Intent(mCtx, BackgroundService.class);
-            mCtx.bindService(intent, serviceConnect, Context.BIND_AUTO_CREATE);
-        */
+
 
         requestWindowFeature(Window.ID_ANDROID_CONTENT);
         requestWindowFeature(Window.FEATURE_LEFT_ICON);
@@ -226,7 +208,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     }
     
     /*
-     *   볼륨을 설정한 데로 제어한다.
+     *   蹂쇰ⅷ�쓣 �꽕�젙�븳 �뜲濡� �젣�뼱�븳�떎.
      * 
      * */
     public void keepVolumeWorker() {
