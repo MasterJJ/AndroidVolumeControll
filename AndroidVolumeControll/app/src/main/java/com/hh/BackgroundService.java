@@ -34,7 +34,7 @@ public class BackgroundService extends Service {
     public static final String VOLUME_BLUETOOTH_SCO = "volume_bluetooth_sco";
     public static final String VOLUME_NOTIFICATION = "volume_notification";
     private  static final String[] DEF_VOLUME_SETTINGS = {
-            VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING, VOLUME_MUSIC,
+            VOLUME_MUSIC, VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING,
             VOLUME_ALARM, VOLUME_NOTIFICATION, VOLUME_BLUETOOTH_SCO
     };
 
@@ -137,15 +137,15 @@ public class BackgroundService extends Service {
     * */
     public void keepVolumeWorker() {
         // get val
-        int current_val = audioManager.getStreamVolume(0);
-        if (voiceVolumeTemp != current_val) {
+        int current_val = audioManager.getStreamVolume(3);
+        if (voiceVolumeTemp < current_val) {
             if (keepVolumeMode) {
                 Log.d(TAG, "Keep Volume : " +  voiceVolumeTemp);
                 System.out.println("Keep Volume : ");
-                audioManager.setStreamVolume(0, voiceVolumeTemp, 0);
+                audioManager.setStreamVolume(0, voiceVolumeTemp, 3);
             } else {
                 voiceVolumeTemp = current_val;
-                Log.d(TAG, "Keep Volume Change: " +  voiceVolumeTemp);
+                Log.d(TAG, "Keep Volume Change: " +  current_val);
                 System.out.println("Keep Volume Change: ");
             }
         }
@@ -172,14 +172,6 @@ public class BackgroundService extends Service {
         //Intent newIntent = new Intent(this, VolumeDialog.class);
         //startActivity(newIntent);
         startKeepVolumeWorker(true);
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
         System.out.println("onStart Backgroundservice");
         Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
         System.out.println("onStart Backgroundservice");
@@ -298,7 +290,7 @@ public class BackgroundService extends Service {
 
         public void run() {
             Log.d(TAG, "Set setStreamVolume");
-            mAudioManager.setStreamVolume(mStreamType, mLastProgress, 0);
+            mAudioManager.setStreamVolume(mStreamType, mLastProgress, 3);
         }
 
         //  get current volume

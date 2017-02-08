@@ -41,23 +41,24 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     public static final String VOLUME_BLUETOOTH_SCO = "volume_bluetooth_sco";
     public static final String VOLUME_NOTIFICATION = "volume_notification";
     private  static final String[] DEF_VOLUME_SETTINGS = {
-            VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING, VOLUME_MUSIC,
+            VOLUME_MUSIC, VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING,
             VOLUME_ALARM, VOLUME_NOTIFICATION, VOLUME_BLUETOOTH_SCO
     };
 
     private SeekBarVolumizer[] mSeekBarVolumizer;
     private static final int[] SEEKBAR_ID = new int[] {
-        R.id.incoming_call_volume_seekbar,
-        R.id.notification_volume_seekbar,
-        R.id.media_volume_seekbar,
-        R.id.alarm_volume_seekbar
+        //R.id.incoming_call_volume_seekbar,
+        //R.id.notification_volume_seekbar,
+        R.id.Media_volume_seekbar,
+        //R.id.alarm_volume_seekbar
     };
     private static final int[] SEEKBAR_TYPE = new int[] {
-        AudioManager.STREAM_VOICE_CALL,
-        //AudioManager.STREAM_RING,
-        AudioManager.STREAM_NOTIFICATION,
         AudioManager.STREAM_MUSIC,
-        AudioManager.STREAM_SYSTEM,
+        //AudioManager.STREAM_VOICE_CALL,
+        //AudioManager.STREAM_RING,
+        //AudioManager.STREAM_NOTIFICATION,
+        //AudioManager.STREAM_MUSIC,
+        //AudioManager.STREAM_SYSTEM,
         //AudioManager.STREAM_VOICE_CALL,
     };
     
@@ -72,11 +73,9 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     private Context mContext;
     private Button mButtonOK;
     private Button mButtonCancel;
-    private boolean mKeepVolumeMode = true;
+    private boolean mKeepVolumeMode = false;
     private Thread  keepVolumeThread = null;
     private static int     voiceVolumeTemp = 0;
-
-
 
 
 
@@ -206,25 +205,25 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             settingData.savePreferences("voice_volume", String.valueOf(voiceVolumeTemp));
         }
     }
-    
+
     /*
      *   蹂쇰ⅷ�쓣 �꽕�젙�븳 �뜲濡� �젣�뼱�븳�떎.
      * 
      * */
     public void keepVolumeWorker() {
-    	// get val
-    	int current_val = mSeekBarVolumizer[0].getVolumeVal();
-    	if (voiceVolumeTemp != current_val) {
-    		if (mKeepVolumeMode) {
+        // get val
+        int current_val = mSeekBarVolumizer[0].getVolumeVal();
+        if (voiceVolumeTemp < current_val) {
+            if (mKeepVolumeMode) {
                 Log.d(TAG, "Keep Volume : " +  voiceVolumeTemp);
-    			mSeekBarVolumizer[0].postSetVolumeEx(voiceVolumeTemp);
-    		} else {
+                mSeekBarVolumizer[0].postSetVolumeEx(voiceVolumeTemp);
+            } else {
                 voiceVolumeTemp = current_val;
-                Log.d(TAG, "Keep Volume Change: " +  voiceVolumeTemp);
-    		}
-    	}
-    	
-    	return;
+                Log.d(TAG, "Keep Volume Change: " +  current_val);
+            }
+        }
+
+        return;
     }
 
     @Override
@@ -263,40 +262,40 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         }
     }
 
-    @Override
-    public void onBackPressed() {
+@Override
+public void onBackPressed() {
         revertVolume();
         closeVolumes();
         ((VolumeControl)mContext).close();
-    }
-    
-    private void revertVolume() {
+        }
+
+private void revertVolume() {
         for (SeekBarVolumizer vol : mSeekBarVolumizer) {
-            vol.revertVolume();
+        vol.revertVolume();
         }
         mcheckBoxMuter.revertMute();
-    }
-    
-    private void closeVolumes() {
-        for (SeekBarVolumizer vol : mSeekBarVolumizer) {
-            vol.stop();
         }
-    }
-    
-    protected void onSampleStarting(SeekBarVolumizer volumizer) {
-        for (SeekBarVolumizer vol : mSeekBarVolumizer) {
-            if (vol != null && vol != volumizer) vol.stopSample();
-        }
-    }
-    
-    public class CheckBoxRinger implements OnCheckedChangeListener, Runnable {
 
-        private Context mContext;
-        private Handler mHandler = new Handler();
-        private AudioManager mAudioManager;
-        private int mOriginalRingerStatus; 
-    
-        private boolean mLastRinger;
+private void closeVolumes() {
+        for (SeekBarVolumizer vol : mSeekBarVolumizer) {
+        vol.stop();
+        }
+        }
+
+protected void onSampleStarting(SeekBarVolumizer volumizer) {
+        for (SeekBarVolumizer vol : mSeekBarVolumizer) {
+        if (vol != null && vol != volumizer) vol.stopSample();
+        }
+        }
+
+public class CheckBoxRinger implements OnCheckedChangeListener, Runnable {
+
+    private Context mContext;
+    private Handler mHandler = new Handler();
+    private AudioManager mAudioManager;
+    private int mOriginalRingerStatus;
+
+    private boolean mLastRinger;
         private CheckBox mCheckBox;
         
         private ContentObserver mRingerObserver = new ContentObserver(mHandler) {
@@ -361,7 +360,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
     
         private AudioManager mAudioManager;
         private int mStreamType;
-        private int mOriginalStreamVolume; 
+        private int mOriginalStreamVolume;
         private Ringtone mRingtone;
     
         private int mLastProgress = -1;
@@ -411,7 +410,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
             } else if (mStreamType == AudioManager.STREAM_NOTIFICATION) {
                 defaultUri = Settings.System.DEFAULT_NOTIFICATION_URI;
             } else if (mStreamType == AudioManager.STREAM_MUSIC) {
-                defaultUri = Settings.System.DEFAULT_RINGTONE_URI;
+                defaultUri = Settings.System.DEFAULT_NOTIFICATION_URI;
             } else {
                 defaultUri = Settings.System.DEFAULT_ALARM_ALERT_URI;
             }
@@ -429,7 +428,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         }
         
         public void revertVolume() {
-            mAudioManager.setStreamVolume(mStreamType, mOriginalStreamVolume, 0);
+            mAudioManager.setStreamVolume(mStreamType, mOriginalStreamVolume, 3);
         }
         
         public void onProgressChanged(SeekBar seekBar, int progress,
@@ -466,7 +465,7 @@ public class VolumeDialog extends Dialog implements OnClickListener, DialogInter
         
         public void run() {
         	Log.d(TAG, "Set setStreamVolume");
-            mAudioManager.setStreamVolume(mStreamType, mLastProgress, 0);
+            mAudioManager.setStreamVolume(mStreamType, mLastProgress, 3);
         }
         
         private void sample() {

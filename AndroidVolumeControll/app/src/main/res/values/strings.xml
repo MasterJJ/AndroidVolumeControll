@@ -10,14 +10,9 @@
     <string name="silent_mode_summary">Silence all sounds except media &amp; alarms</string>
     <!-- Sound settings screen, setting option summary text when going into silent mode.  Media WILL NOT be silenced in silent mode, but alarms WILL be silenced. -->
     <string name="silent_mode_incl_alarm_summary">All sounds except media are silenced</string>
-    <!-- Sound settings screen, the title of the volume bar to adjust the incoming call volume -->
-    <string name="incoming_call_volume_title">Incoming Call</string>
-    <!-- Sound settings screen, the title of the volume bar to adjust the notification volume -->
-    <string name="notification_volume_title">Notification</string>
-    <!-- Sound settings screen, setting option name -->
-    <string name="media_volume_title">Media</string>
-    <!-- Sound settings screen, alarm volume slider title -->
-    <string name="system_volume_title">System</string>
+
+    <string name="Media_volume_title">Media</string>
+
     <!-- Sound settings screen, mute checkbox title -->
     <string name="mute_volume_tilte">Mute</string>
 

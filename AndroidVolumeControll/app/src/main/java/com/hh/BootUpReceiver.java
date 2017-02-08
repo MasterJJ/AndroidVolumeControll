@@ -15,11 +15,15 @@ public class BootUpReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
 
-        	
         	// start activity
-        	
-        	// call VolumeControl
-        	
+            // call VolumeControl
+            Intent startActivity = new Intent(context, VolumeControl.class);
+
+            if (intent != null) {
+                startActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity.putExtra("bootup", true);
+                context.startActivity(startActivity);
+            }
             
         }
     }
