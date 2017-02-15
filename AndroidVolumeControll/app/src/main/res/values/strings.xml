@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Volume Control</string>
+    <string name="app_name">Safe Volume Control</string>
 
     <!-- Sound settings screen heading -->
     <string name="sound_settings">Sound settings</string>
@@ -14,8 +14,6 @@
     <string name="Media_volume_title">Media</string>
 
     <!-- Sound settings screen, mute checkbox title -->
-    <string name="mute_volume_tilte">Mute</string>
-
-    <string name="keep_volume_tilte">Keep</string>
+    <string name="keep_volume_tilte">Enable</string>
 
 </resources>

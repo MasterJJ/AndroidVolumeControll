@@ -62,14 +62,6 @@
 				android:paddingRight="20dip">
 
 				<!-- Used for un/mute -->
-				<CheckBox android:id="@+id/mute_volume_checkbox"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:paddingTop="2dip"
-					android:paddingLeft="30dip"
-					android:paddingRight="30dip"
-					android:text="@string/mute_volume_tilte"/>
 
 				<!-- Used for un/mute -->
 				<CheckBox android:id="@+id/keep_volum_checkbox"

@@ -33,7 +33,7 @@ public class BackgroundService extends Service {
     public static final String VOLUME_ALARM = "volume_alarm";
     public static final String VOLUME_BLUETOOTH_SCO = "volume_bluetooth_sco";
     public static final String VOLUME_NOTIFICATION = "volume_notification";
-    private  static final String[] DEF_VOLUME_SETTINGS = {
+    private static final String[] DEF_VOLUME_SETTINGS = {
             VOLUME_MUSIC, VOLUME_VOICE, VOLUME_SYSTEM, VOLUME_RING,
             VOLUME_ALARM, VOLUME_NOTIFICATION, VOLUME_BLUETOOTH_SCO
     };
@@ -42,7 +42,7 @@ public class BackgroundService extends Service {
     //(AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
 
-    private final IBinder localBinder  = new BackgounrdServiceBinder();
+    private final IBinder localBinder = new BackgounrdServiceBinder();
 
     public class BackgounrdServiceBinder extends Binder {
         BackgroundService getService() {
@@ -55,7 +55,7 @@ public class BackgroundService extends Service {
     private static Context mCtx = null;
     private static int voiceVolume = 0;
     private static boolean keepVolumeMode = false;
-    private Thread  keepVolumeThread = null;
+    private Thread keepVolumeThread = null;
     private static boolean foregroundServiceMode = false;
     private static int voiceVolumeTemp = 0;
 
@@ -92,8 +92,7 @@ public class BackgroundService extends Service {
 
             @Override
             public void run() {
-                Log.d(TAG, " Run Background keepVolumeThread");
-                System.out.println("Run Background keepVolumeThread");
+
                 while (keepVolumeMode) {
                     try {
                         Thread.sleep(300);
@@ -101,12 +100,8 @@ public class BackgroundService extends Service {
                         e.printStackTrace();
                     }
                     keepVolumeWorker();
-                    Log.e(TAG, " Run keepVolumeThread Background service");
-                    System.out.println("Run keepVolumeThread Background service");
 
                 }
-                System.out.println("Exit keepVolumeThread");
-                Log.e(TAG, " Exit keepVolumeThread");
             }
 
         }
@@ -127,7 +122,6 @@ public class BackgroundService extends Service {
         }
 
 
-
         return true;
     }
 
@@ -140,13 +134,11 @@ public class BackgroundService extends Service {
         int current_val = audioManager.getStreamVolume(3);
         if (voiceVolumeTemp < current_val) {
             if (keepVolumeMode) {
-                Log.d(TAG, "Keep Volume : " +  voiceVolumeTemp);
-                System.out.println("Keep Volume : ");
-                audioManager.setStreamVolume(0, voiceVolumeTemp, 3);
+                Log.d(TAG, "Keep Volume : " + voiceVolumeTemp);
+                audioManager.setStreamVolume(3, voiceVolumeTemp, 3);
             } else {
                 voiceVolumeTemp = current_val;
-                Log.d(TAG, "Keep Volume Change: " +  current_val);
-                System.out.println("Keep Volume Change: ");
+                Log.d(TAG, "Keep Volume Change: " + current_val);
             }
         }
         return;
@@ -156,26 +148,22 @@ public class BackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(Constants.ACTION.STARTFORGROUND_ACTION)) {
 
-            System.out.println("onStart Backgroundservice");
             Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
             //startKeepVolumeWorker(true);
+            startKeepVolumeWorker(true);
         } else {
-            stopForeground(true);
+            Toast.makeText(this, "onStop Backgroundservice", Toast.LENGTH_SHORT).show();
+            stopKeepVolumeWorker();
         }
 
 
-       return super.onStartCommand(intent, flags, startId);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onStart(Intent intent, int startid) {
         //Intent newIntent = new Intent(this, VolumeDialog.class);
         //startActivity(newIntent);
-        startKeepVolumeWorker(true);
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
-        System.out.println("onStart Backgroundservice");
-        Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -203,108 +191,12 @@ public class BackgroundService extends Service {
                 keepVolumeMode = false;
 
             // keep mode
-            String getVoiceVolume = settingData.getPreferences("voice_volume");
+            String getVoiceVolume = settingData.getPreferences("media_volume");
             if (getVoiceVolume.length() > 0)
-                voiceVolumeTemp =  voiceVolume = Integer.parseInt(getVoiceVolume);
+                voiceVolumeTemp = voiceVolume = Integer.parseInt(getVoiceVolume);
 
         }
     }
 
-
-
-
-    public class SeekBarVolumizer implements Runnable {
-
-        private Context mContext;
-        private Handler mHandler = new Handler();
-        private AudioManager mAudioManager;
-        private int mStreamType;
-        private int mOriginalStreamVolume;
-        private Ringtone mRingtone;
-
-        private int mLastProgress = -1;
-        private ContentObserver mVolumeObserver = new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange) {
-                super.onChange(selfChange);
-
-                    int volume = Settings.System.getInt(mContext.getContentResolver(),
-                            DEF_VOLUME_SETTINGS[mStreamType], -1);
-
-            }
-        };
-
-        public SeekBarVolumizer(Context context, int streamType) {
-            mContext = context;
-            mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            mStreamType = streamType;
-            init();
-        }
-
-        @TargetApi(Build.VERSION_CODES.ECLAIR)
-        private void init() {
-            mAudioManager.getStreamMaxVolume(mStreamType);
-            mOriginalStreamVolume = mAudioManager.getStreamVolume(mStreamType);
-
-            mContext.getContentResolver().registerContentObserver(
-                    Settings.System.getUriFor(DEF_VOLUME_SETTINGS[mStreamType]),
-                    false, mVolumeObserver);
-
-            Uri defaultUri = null;
-
-            if (mStreamType == AudioManager.STREAM_VOICE_CALL) {
-                defaultUri = Settings.System.DEFAULT_NOTIFICATION_URI;
-            } else if (mStreamType == AudioManager.STREAM_RING) {
-                defaultUri = Settings.System.DEFAULT_RINGTONE_URI;
-            } else if (mStreamType == AudioManager.STREAM_NOTIFICATION) {
-                defaultUri = Settings.System.DEFAULT_NOTIFICATION_URI;
-            } else if (mStreamType == AudioManager.STREAM_MUSIC) {
-                defaultUri = Settings.System.DEFAULT_RINGTONE_URI;
-            } else {
-                defaultUri = Settings.System.DEFAULT_ALARM_ALERT_URI;
-            }
-
-            mRingtone = RingtoneManager.getRingtone(mContext, defaultUri);
-            if (mRingtone != null) {
-                mRingtone.setStreamType(mStreamType);
-            }
-        }
-
-        public void stop() {
-            mContext.getContentResolver().unregisterContentObserver(mVolumeObserver);
-        }
-
-
-        void postSetVolume(int progress) {
-            mLastProgress = progress;
-            mHandler.removeCallbacks(this);
-            mHandler.post(this);
-        }
-
-
-        void postSetVolumeEx(int progress) {
-            mLastProgress = progress;
-            mHandler.removeCallbacks(this);
-            mHandler.post(this);
-        }
-
-        public void run() {
-            Log.d(TAG, "Set setStreamVolume");
-            mAudioManager.setStreamVolume(mStreamType, mLastProgress, 3);
-        }
-
-        //  get current volume
-        public int  getVolumeVal() {
-            return mAudioManager.getStreamVolume(mStreamType);
-        }
-
-
-        public void onSaveInstanceState(VolumeDialog.VolumeStore volumeStore) {
-            if (mLastProgress >= 0) {
-                volumeStore.volume = mLastProgress;
-                volumeStore.originalVolume = mOriginalStreamVolume;
-            }
-        }
-    }
 
 }

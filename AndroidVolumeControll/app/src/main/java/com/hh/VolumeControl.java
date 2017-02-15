@@ -16,16 +16,23 @@ public class VolumeControl extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
 
+        Context ctx = this;
+
         // if bootup mode
         Intent intent = getIntent();
         boolean bootUpMode = intent.getBooleanExtra("bootup", false);
         if (bootUpMode == true) {
             Intent startIntent;
-            Context ctx = this;
             startIntent = new Intent(ctx, BackgroundService.class);
             startIntent.setAction(Constants.ACTION.STARTFORGROUND_ACTION);
             ctx.startService(startIntent);
+            finish();
         } else {
+            // stop service
+            Intent startIntent;
+            startIntent = new Intent(ctx, BackgroundService.class);
+            startIntent.setAction(Constants.ACTION.STOPFORGROUND_ACTION);
+            ctx.startService(startIntent);
             showVolumeDialog();
         }
 
