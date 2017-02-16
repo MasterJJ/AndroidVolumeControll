@@ -146,13 +146,17 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         if (intent.getAction().equals(Constants.ACTION.STARTFORGROUND_ACTION)) {
 
-            Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "onStart Backgroundservice", Toast.LENGTH_SHORT).show();
             //startKeepVolumeWorker(true);
             startKeepVolumeWorker(true);
+        } else if (intent.getAction().equals(Constants.ACTION.STARTFORGROUND_ACTION1)) {
+            //Toast.makeText(this, "onStop Backgroundservice STARTFORGROUND_ACTION1", Toast.LENGTH_SHORT).show();
+
         } else {
-            Toast.makeText(this, "onStop Backgroundservice", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "onStop Backgroundservice", Toast.LENGTH_SHORT).show();
             stopKeepVolumeWorker();
         }
 

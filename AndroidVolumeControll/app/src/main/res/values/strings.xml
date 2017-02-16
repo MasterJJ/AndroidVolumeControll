@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Safe Volume Control</string>
+    <string name="app_name">Safe My Ears</string>
 
     <!-- Sound settings screen heading -->
     <string name="sound_settings">Sound settings</string>

@@ -8,6 +8,7 @@ public class Constants {
 
     public interface ACTION {
         public static String STARTFORGROUND_ACTION = "StartForground";
+        public static String STARTFORGROUND_ACTION1 = "StartForgroundtest1";
         public static String STOPFORGROUND_ACTION = "StopForground";
     }
 
